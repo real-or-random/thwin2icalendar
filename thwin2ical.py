@@ -14,6 +14,7 @@ import csv
 from icalendar import Calendar, Event, vDatetime
 from datetime import datetime, timedelta
 import hashlib
+from tkinter import Tk
 from tkinter.filedialog import askopenfilename, asksaveasfilename
 
 # TODO constants
@@ -35,8 +36,13 @@ DEFAULT_OUTFILE = 'dienstplan.ics'
 counter = 0
 
 def main():
+    root = Tk()
+    root.withdraw()
+
+    # TODO error handling
     infile = infile_picker()
     outfile = outfile_picker()
+
     reader = csv.reader(open(infile, 'r'), delimiter=';')
     cal = create_calendar(reader)
 
