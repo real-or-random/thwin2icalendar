@@ -5,9 +5,9 @@ THWin2iCal - Converts CSV output from THWin to an iCal calendar
 
 Written in 2015 by Tim Ruffing <tim@timruffing.de>
 
-    To the extent possible under law, the author(s) have dedicated all copyright and related and neighboring rights to this software to the public domain worldwide. This software is distributed without any warranty.
+To the extent possible under law, the author(s) have dedicated all copyright and related and neighboring rights to this software to the public domain worldwide. This software is distributed without any warranty.
 
-    You should have received a copy of the CC0 Public Domain Dedication along with this software. If not, see <http://creativecommons.org/publicdomain/zero/1.0/>.
+You should have received a copy of the CC0 Public Domain Dedication along with this software. If not, see <http://creativecommons.org/publicdomain/zero/1.0/>.
 """
 
 import csv
@@ -26,6 +26,7 @@ SUMMARY = 7
 RESPONSIBLE = 8
 PARTICIPANTS = 9
 
+# TODO config file?
 UID_SUFFIX = '@thw-igb.de'
 DEFAULT_INFILE = 'dienstplan.csv'
 DEFAULT_OUTFILE = 'dienstplan.ics'
@@ -33,6 +34,7 @@ DEFAULT_OUTFILE = 'dienstplan.ics'
 counter = 0
 
 def main(infile=DEFAULT_INFILE, outfile=DEFAULT_OUTFILE):
+    # TODO filepicker
     reader = csv.reader(open(infile, 'r'), delimiter=';')
     cal = create_calendar(reader)
 
