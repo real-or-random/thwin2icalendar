@@ -14,6 +14,7 @@ import csv
 from icalendar import Calendar, Event, vDatetime
 from datetime import datetime, timedelta
 import hashlib
+from tkinter.filedialog import askopenfilename, asksaveasfilename
 
 # TODO constants
 START = 1
@@ -33,8 +34,8 @@ DEFAULT_OUTFILE = 'dienstplan.ics'
 
 counter = 0
 
-def main(infile=DEFAULT_INFILE, outfile=DEFAULT_OUTFILE):
-    # TODO filepicker
+def main(outfile=DEFAULT_OUTFILE):
+    infile = infile_picker()
     reader = csv.reader(open(infile, 'r'), delimiter=';')
     cal = create_calendar(reader)
 
@@ -43,8 +44,17 @@ def main(infile=DEFAULT_INFILE, outfile=DEFAULT_OUTFILE):
     f.write(cal.to_ical())
     f.close()
 
+def infile_picker():
+    infile_dialog_opt = {}
+    infile_dialog_opt['defaultextension'] = '.csv'
+    infile_dialog_opt['filetypes'] = [('CSV-Dateien', '.csv'), ('Alle Dateien', '.*')]
+    infile_dialog_opt['initialdir'] = 'G:\\Thwin Export' # FIXME check dir name
+    infile_dialog_opt['title'] = 'CSV-Datei (aus THWin) auswählen'
+    return askopenfilename(**infile_dialog_opt)
+
 def create_calendar(csv_reader):
     # skip first row
+    # TODO verify first row
     next(csv_reader)
 
     cal = Calendar()
