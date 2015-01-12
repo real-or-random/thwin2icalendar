@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-THWin2iCal - Converts CSV output from THWin to an iCal calendar
+THWin2iCalendar - Converts CSV output from THWin to an iCalendar
 
 Written in 2015 by Tim Ruffing <tim@timruffing.de>
 
@@ -34,8 +34,9 @@ DEFAULT_OUTFILE = 'dienstplan.ics'
 
 counter = 0
 
-def main(outfile=DEFAULT_OUTFILE):
+def main():
     infile = infile_picker()
+    outfile = outfile_picker()
     reader = csv.reader(open(infile, 'r'), delimiter=';')
     cal = create_calendar(reader)
 
@@ -45,12 +46,20 @@ def main(outfile=DEFAULT_OUTFILE):
     f.close()
 
 def infile_picker():
-    infile_dialog_opt = {}
-    infile_dialog_opt['defaultextension'] = '.csv'
-    infile_dialog_opt['filetypes'] = [('CSV-Dateien', '.csv'), ('Alle Dateien', '.*')]
-    infile_dialog_opt['initialdir'] = 'G:\\Thwin Export' # FIXME check dir name
-    infile_dialog_opt['title'] = 'CSV-Datei (aus THWin) auswählen'
-    return askopenfilename(**infile_dialog_opt)
+    dialog_opt = {}
+    dialog_opt['defaultextension'] = '.csv'
+    dialog_opt['filetypes'] = [('CSV-Dateien', '.csv'), ('Alle Dateien', '.*')]
+    dialog_opt['initialdir'] = 'G:\\Thwin Export' # FIXME check dir name
+    dialog_opt['title'] = 'CSV-Datei (aus THWin) öffnen'
+    return askopenfilename(**dialog_opt)
+
+def outfile_picker():
+    dialog_opt = {}
+    dialog_opt['defaultextension'] = '.ics'
+    dialog_opt['filetypes'] = [('iCalendar', '.ics'), ('Alle Dateien', '.*')]
+    dialog_opt['initialdir'] = 'G:\\Thwin Export' # FIXME check dir name
+    dialog_opt['title'] = 'iCalendar-Datei speichern'
+    return asksaveasfilename(**dialog_opt)
 
 def create_calendar(csv_reader):
     # skip first row
