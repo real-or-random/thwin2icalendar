@@ -39,10 +39,15 @@ def main():
     root = Tk()
     root.withdraw()
 
-    # TODO error handling
     infile = infile_picker()
-    outfile = outfile_picker()
+    if infile == "":
+        sys.exit(1)
 
+    outfile = outfile_picker()
+    if outfile == "":
+        sys.exit(1)
+
+    # TODO error handling
     reader = csv.reader(open(infile, 'r'), delimiter=';')
     cal = create_calendar(reader)
 
