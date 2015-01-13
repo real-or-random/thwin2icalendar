@@ -100,6 +100,7 @@ def create_event(row):
     event.add('location', get_location(row))
     cats = get_categories(row)
     if len(cats) > 0:
+        # FIXME unnecessary quoting
         event.set_inline('categories', get_categories(row))
     event.add('uid', get_uid(row))
     counter += 1
@@ -136,8 +137,11 @@ def get_summary_and_description(row):
         desc += 'Themen:\n'
     desc += row[SUMMARY_TOPIC].strip() + '\n\n'
 
-    if len(row[RESPONSIBLE]) > 0:
-        desc += 'Leitende:\n' + row[RESPONSIBLE] + '\n\n'
+    responsible = row[RESPONSIBLE]
+    if len(responsible) > 0:
+        # remove unnecessary linebreak after name
+        responsible = responsible.replace('\r\n(', ' (').replace('\n(', ' (').replace('\r(', ' (')
+        desc += 'Leitende:\n' + responsible + '\n\n'
 
     if len(row[PARTICIPANTS]) > 0:
         desc += 'Teilnehmer:\n' + row[PARTICIPANTS]
@@ -163,7 +167,6 @@ def get_type(row):
         return training
     else:
         return sanitize(row[TYPE])
-
 
 def get_training(row):
     if row[TYPE][:3] == 'S -':
