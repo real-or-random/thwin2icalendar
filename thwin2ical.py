@@ -125,18 +125,22 @@ def get_categories(row):
         tag, summary  = summary[1::].split(']', 1)
         # there might be leading space
         summary.lstrip()
-        tags.append(tag)
+        tags.append(sanitize(tag))
+    tags.append(get_type(row))
     return tags
 
 def get_summary_and_description(row):
-    typ = row[TYPE]
-    if is_training(row):
-        typ = typ[3:].strip()
+    typ = get_type(row)
+    desc  = typ + ' (' + row[CLOTHES] + ')' + '\n\n'
+    if get_training(row):
+        desc += 'Themen:\n'
+    desc += row[SUMMARY_TOPIC].strip() + '\n\n'
 
-    desc  = typ + ' (' + row[CLOTHES] + ')'          + '\n\n'
-    desc += row[SUMMARY_TOPIC].strip()               + '\n\n'
-    desc += 'Leitende:\n' + row[RESPONSIBLE]         + '\n\n'
-    desc += 'Teilnehmer:\n'      + row[PARTICIPANTS]
+    if len(row[RESPONSIBLE]) > 0:
+        desc += 'Leitende:\n' + row[RESPONSIBLE] + '\n\n'
+
+    if len(row[PARTICIPANTS]) > 0:
+        desc += 'Teilnehmer:\n' + row[PARTICIPANTS]
 
     lines = row[SUMMARY_TOPIC].strip().splitlines()
 
@@ -151,10 +155,21 @@ def get_summary_and_description(row):
     if len(lines) > 1:
         summary += " (...)"
 
-    return (summary, desc)
+    return (sanitize(summary), desc)
 
-def is_training(row):
-    return row[TYPE][:3] == 'S -'
+def get_type(row):
+    training = get_training(row)
+    if training:
+        return training
+    else:
+        return sanitize(row[TYPE])
+
+
+def get_training(row):
+    if row[TYPE][:3] == 'S -':
+        return sanitize(row[TYPE][3:])
+    else:
+        return None
 
 def is_general(row):
     return row[TYPE] in ['Dienst allgemein', 'Jugendarbeit']
@@ -171,6 +186,9 @@ def get_uid(row):
 
 def sha1(s):
     return hashlib.sha1(s.encode('utf-8')).hexdigest()
+
+def sanitize(s):
+    return s.strip().replace('\r\n', ' ').replace('\n', ' ').replace('\r', ' ')
 
 if __name__ == "__main__":
     main()
