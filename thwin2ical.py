@@ -10,6 +10,11 @@ To the extent possible under law, the author(s) have dedicated all copyright and
 You should have received a copy of the CC0 Public Domain Dedication along with this software. If not, see <http://creativecommons.org/publicdomain/zero/1.0/>.
 """
 
+# Exportieren aus THWin:
+# 1. Modul "Verwaltung" -> "Dienst" -> "Dienste"
+# 2. Menü "Datei" -> "Drucken"
+# 3. "Dienst- / Ausbildungsplan" -> CSV-Datei
+
 import csv
 from icalendar import Calendar, Event, vDatetime
 from datetime import datetime, timedelta
@@ -59,8 +64,8 @@ def main():
 def infile_picker():
     dialog_opt = {}
     dialog_opt['defaultextension'] = '.csv'
-    dialog_opt['filetypes'] = [('CSV-Dateien', '.csv'), ('Alle Dateien', '.*')]
-    dialog_opt['initialdir'] = 'G:\\Thwin Export' # FIXME check dir name
+    dialog_opt['filetypes'] = [('CSV-Format', '.csv'), ('Alle Dateien', '.*')]
+    dialog_opt['initialdir'] = 'G:\\THWInExport'
     dialog_opt['title'] = 'CSV-Datei (aus THWin) öffnen'
     return askopenfilename(**dialog_opt)
 
@@ -69,7 +74,7 @@ def outfile_picker():
     dialog_opt = {}
     dialog_opt['defaultextension'] = '.ics'
     dialog_opt['filetypes'] = [('iCalendar', '.ics'), ('Alle Dateien', '.*')]
-    dialog_opt['initialdir'] = 'G:\\Thwin Export' # FIXME check dir name
+    dialog_opt['initialdir'] = 'G:\\THWinExport'
     dialog_opt['title'] = 'iCalendar-Datei speichern'
     return asksaveasfilename(**dialog_opt)
 
@@ -125,7 +130,6 @@ def get_categories(row):
     return tags
 
 def get_description(row):
-    # TODO check if summary can be multiline in THWin
     desc  = row[TYPE] + ' (' + row[CLOTHES] + ')'     + '\n\n'
     desc +=                                            '\n'
     desc += 'Verantwortliche:\n' + row[RESPONSIBLE]  + '\n\n'
@@ -133,6 +137,7 @@ def get_description(row):
     return desc
 
 def get_summary(row):
+    # TODO extract first row, put rest to description. for training, extract type?
     return row[SUMMARY]
 
 def get_location(row):
