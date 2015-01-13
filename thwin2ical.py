@@ -48,7 +48,7 @@ def main():
         sys.exit(1)
 
     # TODO error handling
-    reader = csv.reader(open(infile, 'r'), delimiter=';')
+    reader = csv.reader(open(infile, 'r', encoding='iso-8859-15'), delimiter=';')
     cal = create_calendar(reader)
 
     # save file
@@ -65,6 +65,7 @@ def infile_picker():
     return askopenfilename(**dialog_opt)
 
 def outfile_picker():
+    # TODO implement initial filename
     dialog_opt = {}
     dialog_opt['defaultextension'] = '.ics'
     dialog_opt['filetypes'] = [('iCalendar', '.ics'), ('Alle Dateien', '.*')]
