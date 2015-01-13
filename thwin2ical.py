@@ -22,14 +22,12 @@ import hashlib
 from tkinter import Tk
 from tkinter.filedialog import askopenfilename, asksaveasfilename
 
-# TODO constants
 START = 1
 END = 2
-CATEGORIES = 3
 LOCATION = 4
 TYPE = 5
 CLOTHES = 6
-SUMMARY = 7
+SUMMARY_TOPIC = 7
 RESPONSIBLE = 8
 PARTICIPANTS = 9
 
@@ -94,10 +92,11 @@ def create_calendar(csv_reader):
 def create_event(row):
     global counter
     event = Event()
-    event.add('summary', get_summary(row))
     event.add('dtstart', get_dtstart(row))
     event.add('dtend', get_dtend(row))
-    event.add('description', get_description(row))
+    summary, desc = get_summary_and_description(row)
+    event.add('summary', summary)
+    event.add('description', desc)
     event.add('location', get_location(row))
     cats = get_categories(row)
     if len(cats) > 0:
@@ -121,24 +120,44 @@ def get_dtend(row):
 # e.g. "[FUG Saarpfalzkreis][Übung] Flächenlage"
 def get_categories(row):
     tags = []
-    summary = row[SUMMARY]
+    summary = row[SUMMARY_TOPIC]
     while len(summary) > 0 and summary[0] == '[':
         tag, summary  = summary[1::].split(']', 1)
         # there might be leading space
-        row[SUMMARY].lstrip()
+        summary.lstrip()
         tags.append(tag)
     return tags
 
-def get_description(row):
-    desc  = row[TYPE] + ' (' + row[CLOTHES] + ')'     + '\n\n'
-    desc +=                                            '\n'
-    desc += 'Verantwortliche:\n' + row[RESPONSIBLE]  + '\n\n'
-    desc += 'Teilnehmer:\n'      + row[PARTICIPANTS]
-    return desc
+def get_summary_and_description(row):
+    typ = row[TYPE]
+    if is_training(row):
+        typ = typ[3:].strip()
 
-def get_summary(row):
-    # TODO extract first row, put rest to description. for training, extract type?
-    return row[SUMMARY]
+    desc  = typ + ' (' + row[CLOTHES] + ')'          + '\n\n'
+    desc += row[SUMMARY_TOPIC].strip()               + '\n\n'
+    desc += 'Leitende:\n' + row[RESPONSIBLE]         + '\n\n'
+    desc += 'Teilnehmer:\n'      + row[PARTICIPANTS]
+
+    lines = row[SUMMARY_TOPIC].strip().splitlines()
+
+    summary = ''
+    if not is_general(row):
+        summary += typ
+        if len(lines) > 0:
+            summary += ': '
+
+    if len(lines) > 0:
+        summary += lines[0]
+    if len(lines) > 1:
+        summary += " (...)"
+
+    return (summary, desc)
+
+def is_training(row):
+    return row[TYPE][:3] == 'S -'
+
+def is_general(row):
+    return row[TYPE] in ['Dienst allgemein', 'Jugendarbeit']
 
 def get_location(row):
     return row[LOCATION]
