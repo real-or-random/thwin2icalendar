@@ -175,7 +175,7 @@ def get_training(row):
         return None
 
 def is_general(row):
-    return row[TYPE] in ['Dienst allgemein', 'Jugendarbeit']
+    return row[TYPE] in ['Dienst allgemein', 'Jugendarbeit', 'sonstige technische Hilfeleistung']
 
 def get_location(row):
     return row[LOCATION] + '\n(' + row[CLOTHES] + ')'
