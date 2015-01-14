@@ -98,10 +98,7 @@ def create_event(row):
     event.add('summary', summary)
     event.add('description', desc)
     event.add('location', get_location(row))
-    cats = get_categories(row)
-    if len(cats) > 0:
-        # FIXME unnecessary quoting
-        event.set_inline('categories', get_categories(row))
+    event.add('categories', get_categories(row))
     event.add('uid', get_uid(row))
     counter += 1
     return event
