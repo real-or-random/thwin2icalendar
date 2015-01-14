@@ -129,15 +129,18 @@ def get_categories(row):
 
 def get_summary_and_description(row):
     typ = get_type(row)
-    desc  = typ + ' (' + row[CLOTHES] + ')' + '\n\n'
+    desc  = 'Dienstart:\n' + typ + '\n\n'
     if get_training(row):
         desc += 'Themen:\n'
+    else:
+        desc += 'Beschreibung:\n'
     desc += row[SUMMARY_TOPIC].strip() + '\n\n'
 
     responsible = row[RESPONSIBLE]
     if len(responsible) > 0:
         # remove unnecessary linebreak after name
         responsible = responsible.replace('\r\n(', ' (').replace('\n(', ' (').replace('\r(', ' (')
+        responsible = responsible.replace('\n', '\n  * ').replace('\r', '\r  * ')
         desc += 'Leitende:\n' + responsible + '\n\n'
 
     if len(row[PARTICIPANTS]) > 0:
@@ -175,7 +178,7 @@ def is_general(row):
     return row[TYPE] in ['Dienst allgemein', 'Jugendarbeit']
 
 def get_location(row):
-    return row[LOCATION]
+    return row[LOCATION] + '\n(' + row[CLOTHES] + ')'
 
 def get_uid(row):
     # "persistent" is not really persistent, it is at most a good heuristic.
