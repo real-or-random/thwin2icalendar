@@ -130,21 +130,20 @@ def get_categories(row):
 def get_summary_and_description(row):
     typ = get_type(row)
     desc  = 'Dienstart:\n' + typ + '\n\n'
+
     if get_training(row):
         desc += 'Themen:\n'
+        desc += format_list(row[SUMMARY_TOPIC].strip())
     else:
         desc += 'Beschreibung:\n'
-    desc += row[SUMMARY_TOPIC].strip() + '\n\n'
+        desc += row[SUMMARY_TOPIC].strip()
+    desc += '\n\n'
 
-    responsible = row[RESPONSIBLE]
-    if len(responsible) > 0:
-        # remove unnecessary linebreak after name
-        responsible = responsible.replace('\r\n(', ' (').replace('\n(', ' (').replace('\r(', ' (')
-        responsible = responsible.replace('\n', '\n  * ').replace('\r', '\r  * ')
-        desc += 'Leitende:\n' + responsible + '\n\n'
+    if len(row[RESPONSIBLE]) > 0:
+        desc += 'Leitende:\n' + format_list_persons(row[RESPONSIBLE]) + '\n\n'
 
     if len(row[PARTICIPANTS]) > 0:
-        desc += 'Teilnehmer:\n' + row[PARTICIPANTS]
+        desc += 'Teilnehmer:\n' + format_list_persons(row[PARTICIPANTS])
 
     lines = row[SUMMARY_TOPIC].strip().splitlines()
 
@@ -183,7 +182,8 @@ def get_location(row):
 def get_uid(row):
     # "persistent" is not really persistent, it is at most a good heuristic.
     # We cannot do really better as THWin does not provide us an unique persistent input.
-    # TODO check if PARTICIPANTS is a good idea... maybe this is often changed because we fiddle with the statistics
+    # Including PARTICIPANTS here is not optimal (but among the best we can get).
+    # If we re-export from THWin, this field could have changed, because some people fiddle with the statistics.
     persistent = row[START] + row[PARTICIPANTS]
     return sha1(persistent) + str(counter) + UID_SUFFIX
 
@@ -192,6 +192,14 @@ def sha1(s):
 
 def sanitize(s):
     return s.strip().replace('\r\n', ' ').replace('\n', ' ').replace('\r', ' ')
+
+def format_list(s):
+    return  '  * ' + s.replace('\n', '\n  * ').replace('\r', '\r  * ')
+
+def format_list_persons(s):
+    # remove unnecessary linebreak after name
+    s = s.replace('\r\n(', ' (').replace('\n(', ' (').replace('\r(', ' (')
+    return format_list(s)
 
 if __name__ == "__main__":
     main()
