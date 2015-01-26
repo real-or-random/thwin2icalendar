@@ -21,6 +21,8 @@ from datetime import datetime, timedelta
 import hashlib
 from tkinter import Tk
 from tkinter.filedialog import askopenfilename, asksaveasfilename
+import os.path
+import sys
 
 START = 1
 END = 2
@@ -33,8 +35,6 @@ PARTICIPANTS = 9
 
 # TODO config file?
 UID_SUFFIX = '@thw-igb.de'
-DEFAULT_INFILE = 'dienstplan.csv'
-DEFAULT_OUTFILE = 'dienstplan.ics'
 
 counter = 0
 
@@ -43,14 +43,15 @@ def main():
     root.withdraw()
 
     infile = infile_picker()
-    if infile == "":
+    if len(infile) == 0:
         sys.exit(1)
 
-    outfile = outfile_picker()
+    outfile = outfile_picker(infile)
     if outfile == "":
         sys.exit(1)
 
     # TODO error handling
+    # TODO a way to select encodings, maybe command line?
     reader = csv.reader(open(infile, 'r', encoding='iso-8859-15'), delimiter=';')
     cal = create_calendar(reader)
 
@@ -67,12 +68,12 @@ def infile_picker():
     dialog_opt['title'] = 'CSV-Datei (aus THWin) öffnen'
     return askopenfilename(**dialog_opt)
 
-def outfile_picker():
-    # TODO implement initial filename
+def outfile_picker(infile):
     dialog_opt = {}
     dialog_opt['defaultextension'] = '.ics'
     dialog_opt['filetypes'] = [('iCalendar', '.ics'), ('Alle Dateien', '.*')]
     dialog_opt['initialdir'] = 'G:\\THWinExport'
+    dialog_opt['initialfile'] = os.path.splitext(os.path.basename(infile))[0] + '.ics'
     dialog_opt['title'] = 'iCalendar-Datei speichern'
     return asksaveasfilename(**dialog_opt)
 
