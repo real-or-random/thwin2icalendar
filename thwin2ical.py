@@ -195,7 +195,8 @@ def sanitize(s):
     return s.strip().replace('\r\n', ' ').replace('\n', ' ').replace('\r', ' ')
 
 def format_list(s):
-    return  '  * ' + s.replace('\n', '\n  * ').replace('\r', '\r  * ')
+    prefix = '  *' + chr(160) # NO-BREAK SPACE
+    return  prefix + s.replace('\n', '\n' + prefix).replace('\r', '\r' + prefix)
 
 def format_list_persons(s):
     # remove unnecessary linebreak after name
