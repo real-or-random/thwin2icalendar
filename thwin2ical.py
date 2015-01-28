@@ -18,6 +18,7 @@ You should have received a copy of the CC0 Public Domain Dedication along with t
 import csv
 from icalendar import Calendar, Event, vDatetime
 from datetime import datetime, timedelta
+from pytz import timezone
 import hashlib
 from tkinter import Tk
 from tkinter.filedialog import askopenfilename, asksaveasfilename
@@ -106,7 +107,8 @@ def create_event(row):
 
 def parse_date(s):
     # TODO error handling
-    return datetime.strptime(s, '%d.%m.%Y, %H:%M:%S')
+    d = datetime.strptime(s, '%d.%m.%Y, %H:%M:%S')
+    return d.replace(tzinfo = timezone('Europe/Berlin'))
 
 def get_dtstart(row):
     return parse_date(row[START])
