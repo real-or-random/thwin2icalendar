@@ -17,7 +17,7 @@ You should have received a copy of the CC0 Public Domain Dedication along with t
 
 import csv
 from icalendar import Calendar, Event, vDatetime
-from datetime import datetime, timedelta
+from datetime import datetime
 from pytz import timezone
 import hashlib
 from tkinter import Tk
