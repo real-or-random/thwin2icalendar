@@ -34,10 +34,7 @@ SUMMARY_TOPIC = 7
 RESPONSIBLE = 8
 PARTICIPANTS = 9
 
-# TODO config file?
-UID_SUFFIX = '@thw-igb.de'
-
-counter = 0
+UID_SUFFIX = 'thwin2icalendar'
 
 def main():
     root = Tk()
@@ -92,7 +89,6 @@ def create_calendar(csv_reader):
     return cal
 
 def create_event(row):
-    global counter
     event = Event()
     event.add('dtstart', get_dtstart(row))
     event.add('dtend', get_dtend(row))
@@ -101,8 +97,6 @@ def create_event(row):
     event.add('description', desc)
     event.add('location', get_location(row))
     event.add('categories', get_categories(row))
-    event.add('uid', get_uid(row))
-    counter += 1
     return event
 
 def parse_date(s):
@@ -183,12 +177,10 @@ def get_location(row):
     return row[LOCATION] + '\n(' + row[CLOTHES] + ')'
 
 def get_uid(row):
-    # "persistent" is not really persistent, it is at most a good heuristic.
+    # "persistent" is not really persistent or unique, it is at most a good heuristic.
     # We cannot do really better as THWin does not provide us an unique persistent input.
-    # Including PARTICIPANTS here is not optimal (but among the best we can get).
-    # If we re-export from THWin, this field could have changed, because some people fiddle with the statistics.
-    persistent = row[START] + row[PARTICIPANTS]
-    return sha1(persistent) + str(counter) + UID_SUFFIX
+    persistent = row[START] + row[END] + row[TYPE] + row[CLOTHES] + row[LOCATION] + row[SUMMARY_TOPIC]
+    return sha1(persistent) + UID_SUFFIX
 
 def sha1(s):
     return hashlib.sha1(s.encode('utf-8')).hexdigest()
