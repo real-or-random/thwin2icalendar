@@ -180,10 +180,10 @@ def get_uid(row):
     # "persistent" is not really persistent or unique, it is at most a good heuristic.
     # We cannot do really better as THWin does not provide us an unique persistent input.
     persistent = row[START] + row[END] + row[TYPE] + row[CLOTHES] + row[LOCATION] + row[SUMMARY_TOPIC]
-    return sha1(persistent) + UID_SUFFIX
+    return digest(persistent) + UID_SUFFIX
 
-def sha1(s):
-    return hashlib.sha1(s.encode('utf-8')).hexdigest()
+def digest(s):
+    return hashlib.sha256(s.encode('utf-8')).hexdigest()
 
 def sanitize(s):
     return s.strip().replace('\r\n', ' ').replace('\n', ' ').replace('\r', ' ')
