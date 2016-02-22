@@ -16,6 +16,7 @@ You should have received a copy of the CC0 Public Domain Dedication along with t
 # 3. "Dienst- / Ausbildungsplan" -> CSV-Datei
 
 import csv
+import codecs
 from icalendar import Calendar, Event, vDatetime
 from datetime import datetime
 from pytz import timezone
@@ -43,12 +44,23 @@ def main():
     root = Tk()
     root.withdraw()
 
-    infile = infile_picker()
-    if infile == '':
+    infilename = infile_picker()
+    if len(infilename) == 0:
         sys.exit(1)
 
-    # TODO a way to select encodings, maybe command line?
-    reader = csv.DictReader(open(infile, 'r', encoding='iso-8859-15'), delimiter=';')
+    infile = None
+    # The THWin export is ISO-8859-15 encoded. To avoid hassle with manually
+    # edited files we support UTF-8 as well.
+    # Try UTF-8 first.
+    try:
+        infile = codecs.open(infilename, 'r', encoding='utf-8', errors='strict')
+        indata = infile.readlines()
+    except UnicodeDecodeError:
+        infile.close()
+        infile = codecs.open(infilename, 'r', encoding='iso-8859-15')
+        indata = infile.readlines()
+
+    reader = csv.DictReader(indata, delimiter=';')
     # verify first row
     try:
         next(reader)
@@ -60,12 +72,14 @@ def main():
 
     cal = create_calendar(reader)
 
-    outfile = outfile_picker(infile)
-    if outfile == "":
+    infile.close()
+
+    outfilename = outfile_picker(infilename)
+    if len(outfilename) == 0:
         sys.exit(1)
 
     # save file
-    f = open(outfile, 'wb')
+    f = open(outfilename, 'wb')
     f.write(cal.to_ical())
     f.close()
 
