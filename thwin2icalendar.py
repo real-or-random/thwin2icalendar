@@ -22,17 +22,20 @@ from pytz import timezone
 import hashlib
 from tkinter import Tk
 from tkinter.filedialog import askopenfilename, asksaveasfilename
+from tkinter.messagebox import showerror
 import os.path
 import sys
 
-START = 1
-END = 2
-LOCATION = 4
-TYPE = 5
-CLOTHES = 6
-SUMMARY_TOPIC = 7
-RESPONSIBLE = 8
-PARTICIPANTS = 9
+START = 'Beginn'
+END = 'Ende'
+LOCATION = 'Ort'
+TYPE = 'Dienstart'
+CLOTHES = 'Bekleidung'
+SUMMARY_TOPIC = 'Thema'
+RESPONSIBLE = 'Dienstverantwortliche'
+PARTICIPANTS = 'Teilnehmer'
+
+FIELDNAMES = [START, END, LOCATION, TYPE, CLOTHES, SUMMARY_TOPIC, RESPONSIBLE, PARTICIPANTS]
 
 UID_SUFFIX = 'thwin2icalendar'
 
@@ -41,17 +44,25 @@ def main():
     root.withdraw()
 
     infile = infile_picker()
-    if len(infile) == 0:
+    if infile == '':
         sys.exit(1)
+
+    # TODO a way to select encodings, maybe command line?
+    reader = csv.DictReader(open(infile, 'r', encoding='iso-8859-15'), delimiter=';')
+    # verify first row
+    try:
+        next(reader)
+    except StopIteration:
+        error('Die ausgewählte Eingabedatei ist keine gültige CSV-Datei.')
+
+    if not all((f in reader.fieldnames) for f in FIELDNAMES):
+        error('Die ausgewählte Eingabedatei enthält keinen THWin-Dienstplan.')
+
+    cal = create_calendar(reader)
 
     outfile = outfile_picker(infile)
     if outfile == "":
         sys.exit(1)
-
-    # TODO error handling
-    # TODO a way to select encodings, maybe command line?
-    reader = csv.reader(open(infile, 'r', encoding='iso-8859-15'), delimiter=';')
-    cal = create_calendar(reader)
 
     # save file
     f = open(outfile, 'wb')
@@ -76,10 +87,6 @@ def outfile_picker(infile):
     return asksaveasfilename(**dialog_opt)
 
 def create_calendar(csv_reader):
-    # skip first row
-    # TODO verify first row
-    next(csv_reader)
-
     cal = Calendar()
     cal.add('prodid', '-//THW//THWIn2iCal//')
     cal.add('version', '2.0')
@@ -100,7 +107,6 @@ def create_event(row):
     return event
 
 def parse_date(s):
-    # TODO error handling
     d = datetime.strptime(s, '%d.%m.%Y, %H:%M:%S')
     return d.replace(tzinfo = timezone('Europe/Berlin'))
 
@@ -197,5 +203,12 @@ def format_list_persons(s):
     s = s.replace('\r\n(', ' (').replace('\n(', ' (').replace('\r(', ' (')
     return format_list(s)
 
+def error(msg):
+    showerror("Fehler", msg)
+    sys.exit(1)
+
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except Exception as e:
+        error(e)
