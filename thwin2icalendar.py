@@ -148,9 +148,11 @@ def get_summary_and_description(row):
     typ = get_type(row)
     desc = typ + '\n\n'
 
+    lines = row[SUMMARY_TOPIC].strip().splitlines()
+
     if get_training(row):
         desc += 'Themen:\n'
-        desc += format_list(row[SUMMARY_TOPIC].strip())
+        desc += format_list(lines)
     else:
         desc += 'Beschreibung:\n'
         desc += row[SUMMARY_TOPIC].strip()
@@ -160,12 +162,12 @@ def get_summary_and_description(row):
         desc += 'Bekleidung:\n' + row[CLOTHES].strip() + '\n\n'
 
     if len(row[RESPONSIBLE]) > 0:
-        desc += 'Leitende:\n' + format_list_persons(row[RESPONSIBLE]) + '\n\n'
+        responsible = sanitize_persons(row[RESPONSIBLE]).splitlines()
+        desc += 'Leitende:\n' + format_list(responsible) + '\n\n'
 
     if len(row[PARTICIPANTS]) > 0:
-        desc += 'Teilnehmer:\n' + format_list_persons(row[PARTICIPANTS])
-
-    lines = row[SUMMARY_TOPIC].strip().splitlines()
+        participants = sanitize_persons(row[PARTICIPANTS]).splitlines()
+        desc += 'Teilnehmer:\n' + format_list(participants)
 
     summary = ''
     if not is_general(row):
@@ -211,14 +213,14 @@ def digest(s):
 def sanitize(s):
     return s.strip().replace('\r\n', ' ').replace('\n', ' ').replace('\r', ' ')
 
-def format_list(s):
-    prefix = '  *' + chr(160) # NO-BREAK SPACE
-    return  prefix + s.replace('\n', '\n' + prefix).replace('\r', '\r' + prefix)
-
-def format_list_persons(s):
+def sanitize_persons(s):
     # remove unnecessary linebreak after name
     s = s.replace('\r\n(', ' (').replace('\n(', ' (').replace('\r(', ' (')
-    return format_list(s)
+    return s
+
+def format_list(ss):
+    prefix = '  *' + chr(160) # NO-BREAK SPACE
+    return '\n'.join([prefix + sanitize(s) for s in ss])
 
 def error(msg):
     showerror("Fehler", msg)
