@@ -146,7 +146,7 @@ def get_categories(row):
 
 def get_summary_and_description(row):
     typ = get_type(row)
-    desc  = 'Dienstart:\n' + typ + '\n\n'
+    desc = typ + '\n\n'
 
     if get_training(row):
         desc += 'Themen:\n'
@@ -155,6 +155,9 @@ def get_summary_and_description(row):
         desc += 'Beschreibung:\n'
         desc += row[SUMMARY_TOPIC].strip()
     desc += '\n\n'
+
+    if len(row[CLOTHES]) > 0:
+        desc += 'Bekleidung:\n' + row[CLOTHES].strip() + '\n\n'
 
     if len(row[RESPONSIBLE]) > 0:
         desc += 'Leitende:\n' + format_list_persons(row[RESPONSIBLE]) + '\n\n'
@@ -194,7 +197,7 @@ def is_general(row):
     return row[TYPE] in ['Dienst allgemein', 'Jugendarbeit', 'sonstige technische Hilfeleistung']
 
 def get_location(row):
-    return row[LOCATION] + '\n(' + row[CLOTHES] + ')'
+    return row[LOCATION]
 
 def get_uid(row):
     # "persistent" is not really persistent or unique, it is at most a good heuristic.
