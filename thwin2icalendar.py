@@ -26,6 +26,7 @@ from tkinter.filedialog import askopenfilename, asksaveasfilename
 from tkinter.messagebox import showerror
 import os.path
 import sys
+import re
 
 START = 'Beginn'
 END = 'Ende'
@@ -150,13 +151,26 @@ def get_summary_and_description(row):
 
     lines = row[SUMMARY_TOPIC].strip().splitlines()
 
+    topics = []
+    i = 0
     if get_training(row):
-        desc += 'Themen:\n'
-        desc += format_list(lines)
-    else:
-        desc += 'Beschreibung:\n'
-        desc += row[SUMMARY_TOPIC].strip()
+        for i in range(len(lines)):
+            # check for curriculum numbers
+            if not re.match('\(([0-9]|\.)*\)  ', lines[i]):
+                break
+    topics = lines[:i]
+    indesc = lines[i:]
+    # remove empty line between topics and description
+    if len(indesc[0]) == 0:
+        indesc.pop(0)
+
+    desc += 'Beschreibung:\n'
+    desc += '\n'.join(indesc)
     desc += '\n\n'
+
+    if len(topics) > 0:
+        desc += 'Themen:\n'
+        desc += format_list(topics) + '\n\n'
 
     if len(row[CLOTHES]) > 0:
         desc += 'Bekleidung:\n' + row[CLOTHES].strip() + '\n\n'
@@ -169,16 +183,13 @@ def get_summary_and_description(row):
         participants = sanitize_persons(row[PARTICIPANTS]).splitlines()
         desc += 'Teilnehmer:\n' + format_list(participants)
 
-    summary = ''
-    if not is_general(row):
-        summary += typ
-        if len(lines) > 0:
-            summary += ': '
-
-    if len(lines) > 0:
-        summary += lines[0]
-    if len(lines) > 1:
-        summary += " (...)"
+    if len(indesc) > 0:
+        summary = indesc[0]
+        if len(indesc) > 1:
+            summary += " (...)"
+        summary += ', ' + typ
+    else:
+        summary = typ
 
     return (sanitize(summary), desc)
 
