@@ -164,8 +164,8 @@ def get_summary_and_description(row):
     if len(indesc[0]) == 0:
         indesc.pop(0)
 
-    desc += 'Beschreibung:\n'
-    desc += '\n'.join(indesc)
+    desc += 'Beschreibung:\n  '
+    desc += '\n  '.join(indesc)
     desc += '\n\n'
 
     if len(topics) > 0:
@@ -173,7 +173,7 @@ def get_summary_and_description(row):
         desc += format_list(topics) + '\n\n'
 
     if len(row[CLOTHES]) > 0:
-        desc += 'Bekleidung:\n' + row[CLOTHES].strip() + '\n\n'
+        desc += 'Bekleidung:\n  ' + row[CLOTHES].strip() + '\n\n'
 
     if len(row[RESPONSIBLE]) > 0:
         responsible = sanitize_persons(row[RESPONSIBLE]).splitlines()
