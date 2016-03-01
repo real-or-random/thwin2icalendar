@@ -114,11 +114,11 @@ def create_event(row):
     event = Event()
     event.add('dtstart', get_dtstart(row))
     event.add('dtend', get_dtend(row))
-    summary, desc = get_summary_and_description(row)
+    summary, desc, categories = get_summary_description_categories(row)
     event.add('summary', summary)
     event.add('description', desc)
+    event.add('categories', categories)
     event.add('location', get_location(row))
-    event.add('categories', get_categories(row))
     return event
 
 def parse_date(s):
@@ -131,21 +131,19 @@ def get_dtstart(row):
 def get_dtend(row):
     return parse_date(row[END])
 
-# Categories can be added at the beginning of the summary,
+# Categories can be added at the beginning of the description,
 # using square brackets
-# e.g. "[FUG Saarpfalzkreis][Übung] Flächenlage"
-def get_categories(row):
+# e.g. "[Besprechung] OA-Sitzung"
+def get_tags(indesc):
     tags = []
-    summary = row[SUMMARY_TOPIC]
-    while len(summary) > 0 and summary[0] == '[':
-        tag, summary  = summary[1::].split(']', 1)
+    while len(indesc) > 0 and indesc[0] == '[':
+        tag, indesc  = indesc[1::].split(']', 1)
         # there might be leading space
-        summary.lstrip()
+        indesc.lstrip()
         tags.append(sanitize(tag))
-    tags.append(get_type(row))
     return tags
 
-def get_summary_and_description(row):
+def get_summary_description_categories(row):
     typ = get_type(row)
     desc = typ + '\n\n'
 
@@ -183,15 +181,18 @@ def get_summary_and_description(row):
         participants = sanitize_persons(row[PARTICIPANTS]).splitlines()
         desc += 'Teilnehmer:\n' + format_list(participants)
 
+    categories = [typ]
+
     if len(indesc) > 0:
         summary = indesc[0]
         if len(indesc) > 1:
             summary += " (...)"
         summary += ', ' + typ
+        categories += get_tags(indesc[0])
     else:
         summary = typ
 
-    return (sanitize(summary), desc)
+    return (summary, desc, categories)
 
 def get_type(row):
     training = get_training(row)
