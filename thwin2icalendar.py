@@ -10,11 +10,6 @@ To the extent possible under law, the author(s) have dedicated all copyright and
 You should have received a copy of the CC0 Public Domain Dedication along with this software. If not, see <http://creativecommons.org/publicdomain/zero/1.0/>.
 """
 
-# Exportieren aus THWin:
-# 1. Modul "Verwaltung" -> "Dienst" -> "Dienste"
-# 2. Menü "Datei" -> "Drucken"
-# 3. "Dienst- / Ausbildungsplan" -> CSV-Datei
-
 import csv
 import codecs
 from icalendar import Calendar, Event, vDatetime
@@ -182,11 +177,8 @@ def get_summary_description_categories(row):
 
     categories = [typ]
 
-    if len(indesc) > 0:
+    if len(indesc) > 0 and len(indesc[0]) > 0:
         summary = indesc[0]
-        if len(indesc) > 1:
-            summary += " (...)"
-        summary += ', ' + typ
         categories += get_tags(indesc[0])
     else:
         summary = typ
