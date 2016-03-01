@@ -39,8 +39,6 @@ PARTICIPANTS = 'Teilnehmer'
 
 FIELDNAMES = [START, END, LOCATION, TYPE, CLOTHES, SUMMARY_TOPIC, RESPONSIBLE, PARTICIPANTS]
 
-UID_SUFFIX = 'thwin2icalendar'
-
 def main():
     root = Tk()
     root.withdraw()
@@ -114,6 +112,7 @@ def create_event(row):
     event = Event()
     event.add('dtstart', get_dtstart(row))
     event.add('dtend', get_dtend(row))
+    event.add('uid', get_uid(row))
     summary, desc, categories = get_summary_description_categories(row)
     event.add('summary', summary)
     event.add('description', desc)
@@ -217,7 +216,7 @@ def get_uid(row):
     # "persistent" is not really persistent or unique, it is at most a good heuristic.
     # We cannot do really better as THWin does not provide us an unique persistent input.
     persistent = row[START] + row[END] + row[TYPE] + row[CLOTHES] + row[LOCATION] + row[SUMMARY_TOPIC]
-    return digest(persistent) + UID_SUFFIX
+    return digest(persistent)
 
 def digest(s):
     return hashlib.sha256(s.encode('utf-8')).hexdigest()
