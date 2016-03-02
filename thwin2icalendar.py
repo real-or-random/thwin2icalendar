@@ -116,7 +116,7 @@ def outfile_picker(infile):
     dialog_opt = {}
     dialog_opt['defaultextension'] = '.ics'
     dialog_opt['filetypes'] = [('iCalendar', '.ics'), ('Alle Dateien', '.*')]
-    dialog_opt['initialdir'] = 'G:\\THWinExport'
+    dialog_opt['initialdir'] = os.path.dirname(infile)
     dialog_opt['initialfile'] = os.path.splitext(os.path.basename(infile))[0] + '.ics'
     dialog_opt['title'] = 'iCalendar-Datei speichern'
     return asksaveasfilename(**dialog_opt)
