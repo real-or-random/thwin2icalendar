@@ -34,6 +34,24 @@ PARTICIPANTS = 'Teilnehmer'
 
 FIELDNAMES = [START, END, LOCATION, TYPE, CLOTHES, SUMMARY_TOPIC, RESPONSIBLE, PARTICIPANTS]
 
+TZ_DEF = b'''BEGIN:VTIMEZONE\r\n\
+TZID:Europe/Berlin\r\n\
+BEGIN:DAYLIGHT\r\n\
+TZOFFSETFROM:+0100\r\n\
+TZOFFSETTO:+0200\r\n\
+TZNAME:MESZ\r\n\
+DTSTART:19700329T020000\r\n\
+RRULE:FREQ=YEARLY;INTERVAL=1;BYDAY=-1SU;BYMONTH=3\r\n\
+END:DAYLIGHT\r\n\
+BEGIN:STANDARD\r\n\
+TZOFFSETFROM:+0200\r\n\
+TZOFFSETTO:+0100\r\n\
+TZNAME:MEZ\r\n\
+DTSTART:19701025T030000\r\n\
+RRULE:FREQ=YEARLY;INTERVAL=1;BYDAY=-1SU;BYMONTH=10\r\n\
+END:STANDARD\r\n\
+END:VTIMEZONE'''
+
 def main():
     root = Tk()
     root.withdraw()
@@ -64,7 +82,9 @@ def main():
     if not all((f in reader.fieldnames) for f in FIELDNAMES):
         error('Die ausgewählte Eingabedatei enthält keinen THWin-Dienstplan.')
 
-    cal = create_calendar(reader)
+    mtime = os.path.getmtime(infilename)
+    dtstamp = datetime.fromtimestamp(mtime)
+    cal = create_calendar(reader, dtstamp)
 
     infile.close()
 
@@ -74,7 +94,14 @@ def main():
 
     # save file
     f = open(outfilename, 'wb')
-    f.write(cal.to_ical())
+    outlines = cal.to_ical().splitlines()
+    # output to file and add hackish VTIMEZONE definition
+    # (The icalendar module does not support exporting of pytz objects.
+    # An alternative way would be to create an icalendar Timezone
+    # object manually.)
+    f.write(b'\r\n'.join(outlines[:3]) + b'\r\n')
+    f.write(TZ_DEF + b'\r\n')
+    f.write(b'\r\n'.join(outlines[3:]))
     f.close()
 
 def infile_picker():
@@ -94,12 +121,14 @@ def outfile_picker(infile):
     dialog_opt['title'] = 'iCalendar-Datei speichern'
     return asksaveasfilename(**dialog_opt)
 
-def create_calendar(csv_reader):
+def create_calendar(csv_reader, dtstamp):
     cal = Calendar()
     cal.add('prodid', '-//THW//THWIn2iCal//')
     cal.add('version', '2.0')
     for row in csv_reader:
-        cal.add_component(create_event(row))
+        event = create_event(row)
+        event.add('dtstamp', dtstamp)
+        cal.add_component(event)
 
     return cal
 
