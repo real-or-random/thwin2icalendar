@@ -77,10 +77,10 @@ def main():
     try:
         next(reader)
     except StopIteration:
-        error('Die ausgewählte Eingabedatei ist keine gültige CSV-Datei.')
+        fatal_error('Die ausgewählte Eingabedatei ist keine gültige CSV-Datei.')
 
     if not all((f in reader.fieldnames) for f in FIELDNAMES):
-        error('Die ausgewählte Eingabedatei enthält keinen THWin-Dienstplan.')
+        fatal_error('Die ausgewählte Eingabedatei enthält keinen THWin-Dienstplan.')
 
     mtime = os.path.getmtime(infilename)
     dtstamp = datetime.fromtimestamp(mtime)
@@ -256,6 +256,9 @@ def format_list(ss):
 
 def error(msg):
     showerror("Fehler", msg)
+
+def fatal_error(msg):
+    error(msg)
     sys.exit(1)
 
 if __name__ == "__main__":
@@ -263,3 +266,4 @@ if __name__ == "__main__":
         main()
     except Exception as e:
         error(e)
+        raise
