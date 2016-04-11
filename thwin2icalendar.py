@@ -76,15 +76,6 @@ def main():
         indata = infile.readlines()
 
     reader = csv.DictReader(indata, delimiter=';')
-    # verify first row
-    try:
-        next(reader)
-    except StopIteration:
-        fatal_error('Die ausgewählte Eingabedatei ist keine gültige CSV-Datei.')
-
-    if not all((f in reader.fieldnames) for f in FIELDNAMES):
-        fatal_error('Die ausgewählte Eingabedatei enthält keinen THWin-Dienstplan.')
-
     mtime = os.path.getmtime(infilename)
     dtstamp = datetime.fromtimestamp(mtime)
     cal = create_calendar(reader, dtstamp)
@@ -128,12 +119,22 @@ def create_calendar(csv_reader, dtstamp):
     cal = Calendar()
     cal.add('prodid', '-//THW//THWIn2iCal//')
     cal.add('version', '2.0')
+
+    # read first row and verify field names
+    first = next(csv_reader)
+    if not all((f in csv_reader.fieldnames) for f in FIELDNAMES):
+        fatal_error('Die ausgewählte Eingabedatei enthält keinen THWin-Dienstplan.')
+
+    process_row(cal, dtstamp, first)
     for row in csv_reader:
-        event = create_event(row)
-        event.add('dtstamp', dtstamp)
-        cal.add_component(event)
+        process_row(cal, dtstamp, row)
 
     return cal
+
+def process_row(cal, dtstamp, row):
+    event = create_event(row)
+    event.add('dtstamp', dtstamp)
+    cal.add_component(event)
 
 def create_event(row):
     event = Event()
