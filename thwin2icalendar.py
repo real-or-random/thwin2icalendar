@@ -32,6 +32,9 @@ SUMMARY_TOPIC = 'Thema'
 RESPONSIBLE = 'Leitende'
 PARTICIPANTS = 'Teilnehmer'
 
+EXERCISE = 'Übung / Wettkampf'
+MISSION = 'Einsatz'
+
 FIELDNAMES = [START, END, LOCATION, TYPE, CLOTHES, SUMMARY_TOPIC, RESPONSIBLE, PARTICIPANTS]
 
 TZ_DEF = b'''BEGIN:VTIMEZONE\r\n\
@@ -172,16 +175,23 @@ def get_summary_description_categories(row):
 
     lines = row[SUMMARY_TOPIC].strip().splitlines()
 
-    topics = []
+    special_desc = []
     i = 0
     if get_training(row):
         for i in range(len(lines)):
-            # check for curriculum numbers
+            # skip lines starting with curriculum numbers
             if not re.match('\(([0-9]|\.)*\)  ', lines[i]):
                 break
-    topics = lines[:i]
+    elif typ == EXERCISE:
+        # first 3 lines: Ebene, Land, Meldefrist
+        i = 3
+    elif typ == MISSION:
+        # first 2 lines: Land, Anforderer
+        i = 2
+    special_desc = lines[:i]
     indesc = lines[i:]
-    # remove empty line between topics and description
+
+    # remove empty line between special description and description
     if len(indesc[0]) == 0:
         indesc.pop(0)
 
@@ -189,9 +199,12 @@ def get_summary_description_categories(row):
     desc += '\n  '.join(indesc)
     desc += '\n\n'
 
-    if len(topics) > 0:
-        desc += 'Themen:\n'
-        desc += format_list(topics) + '\n\n'
+    if len(special_desc) > 0:
+        if (get_training(row)):
+            desc += 'Themen:\n'
+        else:
+            desc += 'Details:\n'
+        desc += format_list(special_desc) + '\n\n'
 
     if len(row[CLOTHES]) > 0:
         desc += 'Bekleidung:\n  ' + row[CLOTHES].strip() + '\n\n'
@@ -209,6 +222,10 @@ def get_summary_description_categories(row):
     if len(indesc) > 0 and len(indesc[0]) > 0:
         summary = indesc[0]
         categories += get_tags(indesc[0])
+        if typ == MISSION or typ == EXERCISE:
+            if summary[0] != '[':
+                summary = ' ' + summary
+            summary = '[' + typ + ']' + summary
     else:
         summary = typ
 
