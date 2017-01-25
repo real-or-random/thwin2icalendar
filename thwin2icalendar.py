@@ -165,7 +165,7 @@ def get_dtend(row):
 def get_tags(indesc):
     tags = []
     while indesc and indesc[0] == '[':
-        tag, indesc  = indesc[1::].split(']', 1)
+        tag, indesc = indesc[1::].split(']', 1)
         # there might be leading space
         indesc.lstrip()
         tags.append(sanitize(tag))
@@ -180,20 +180,20 @@ def get_summary_description_categories(row):
     special_desc = []
     i = 0
     if get_training(row):
-        for i in range(len(lines)):
-            # skip lines starting with curriculum numbers
-            if not re.match('\(([0-9]|\.)*\)  ', lines[i]):
+        for i, line in enumerate(lines):
+            # Skip lines starting with curriculum numbers
+            if not re.match(r'\(([0-9]|\.)*\)  ', line):
                 break
     elif typ == EXERCISE:
-        # first 3 lines: Ebene, Land, Meldefrist
+        # First 3 lines: Ebene, Land, Meldefrist
         i = 3
     elif typ in [MISSION, MISC_RELIEF]:
-        # first 2 lines: Land, Anforderer
+        # First 2 lines: Land, Anforderer
         i = 2
     special_desc = lines[:i]
     indesc = lines[i:]
 
-    # remove empty line between special description and description
+    # Remove empty line between special description and description
     if indesc and not indesc[0]:
         indesc.pop(0)
 
@@ -202,7 +202,7 @@ def get_summary_description_categories(row):
     desc += '\n\n'
 
     if special_desc:
-        if (get_training(row)):
+        if get_training(row):
             desc += 'Themen:\n'
         else:
             desc += 'Details:\n'
@@ -234,17 +234,10 @@ def get_summary_description_categories(row):
     return (summary, desc, categories)
 
 def get_type(row):
-    training = get_training(row)
-    if training:
-        return training
-    else:
-        return sanitize(row[TYPE])
+    return get_training(row) or sanitize(row[TYPE])
 
 def get_training(row):
-    if row[TYPE][:3] == 'S -':
-        return sanitize(row[TYPE][3:])
-    else:
-        return None
+    return sanitize(row[TYPE][3:]) if row[TYPE][:3] == 'S -' else None
 
 def get_location(row):
     return row[LOCATION]
