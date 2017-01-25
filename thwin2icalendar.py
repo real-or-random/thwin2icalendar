@@ -3,7 +3,7 @@
 """
 THWin2iCalendar - Converts CSV output from THWin to an iCalendar
 
-Written in 2015 and 2016 by Tim Ruffing <tim@timruffing.de>
+Written in 2015-2017 by Tim Ruffing <tim@timruffing.de>
 
 To the extent possible under law, the author(s) have dedicated all copyright and related and neighboring rights to this software to the public domain worldwide. This software is distributed without any warranty.
 
@@ -193,7 +193,7 @@ def get_summary_description_categories(row):
     indesc = lines[i:]
 
     # remove empty line between special description and description
-    if len(indesc[0]) == 0:
+    if indesc and not indesc[0]:
         indesc.pop(0)
 
     desc += 'Beschreibung:\n  '
