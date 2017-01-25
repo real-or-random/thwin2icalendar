@@ -34,6 +34,7 @@ PARTICIPANTS = 'Teilnehmer'
 
 EXERCISE = 'Übung / Wettkampf'
 MISSION = 'Einsatz'
+MISC_RELIEF = 'sonstige technische Hilfeleistung'
 
 FIELDNAMES = [START, END, LOCATION, TYPE, CLOTHES, SUMMARY_TOPIC, RESPONSIBLE, PARTICIPANTS]
 
@@ -186,7 +187,7 @@ def get_summary_description_categories(row):
     elif typ == EXERCISE:
         # first 3 lines: Ebene, Land, Meldefrist
         i = 3
-    elif typ == MISSION:
+    elif typ in [MISSION, MISC_RELIEF]:
         # first 2 lines: Land, Anforderer
         i = 2
     special_desc = lines[:i]
