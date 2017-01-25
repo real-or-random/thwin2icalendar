@@ -60,7 +60,7 @@ def main():
     root.withdraw()
 
     infilename = infile_picker()
-    if len(infilename) == 0:
+    if not infilename:
         sys.exit(1)
 
     infile = None
@@ -83,7 +83,7 @@ def main():
     infile.close()
 
     outfilename = outfile_picker(infilename)
-    if len(outfilename) == 0:
+    if not outfilename:
         sys.exit(1)
 
     # save file
@@ -163,7 +163,7 @@ def get_dtend(row):
 # e.g. "[Besprechung] OA-Sitzung"
 def get_tags(indesc):
     tags = []
-    while len(indesc) > 0 and indesc[0] == '[':
+    while indesc and indesc[0] == '[':
         tag, indesc  = indesc[1::].split(']', 1)
         # there might be leading space
         indesc.lstrip()
@@ -200,27 +200,27 @@ def get_summary_description_categories(row):
     desc += '\n  '.join(indesc)
     desc += '\n\n'
 
-    if len(special_desc) > 0:
+    if special_desc:
         if (get_training(row)):
             desc += 'Themen:\n'
         else:
             desc += 'Details:\n'
         desc += format_list(special_desc) + '\n\n'
 
-    if len(row[CLOTHES]) > 0:
+    if row[CLOTHES]:
         desc += 'Bekleidung:\n  ' + row[CLOTHES].strip() + '\n\n'
 
-    if len(row[RESPONSIBLE]) > 0:
+    if row[RESPONSIBLE]:
         responsible = sanitize_persons(row[RESPONSIBLE]).splitlines()
         desc += 'Leitende:\n' + format_list(responsible) + '\n\n'
 
-    if len(row[PARTICIPANTS]) > 0:
+    if row[PARTICIPANTS]:
         participants = sanitize_persons(row[PARTICIPANTS]).splitlines()
         desc += 'Teilnehmer:\n' + format_list(participants)
 
     categories = [typ]
 
-    if len(indesc) > 0 and len(indesc[0]) > 0:
+    if indesc and indesc[0]:
         summary = indesc[0]
         categories += get_tags(indesc[0])
         if typ == MISSION or typ == EXERCISE:
