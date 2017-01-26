@@ -197,9 +197,10 @@ def get_summary_description_categories(row):
     if indesc and not indesc[0]:
         indesc.pop(0)
 
-    desc += 'Beschreibung:\n  '
-    desc += '\n  '.join(indesc)
-    desc += '\n\n'
+    if indesc:
+        desc += 'Beschreibung:\n  '
+        desc += '\n  '.join(indesc)
+        desc += '\n\n'
 
     if special_desc:
         if get_training(row):
