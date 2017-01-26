@@ -177,19 +177,17 @@ def get_summary_description_categories(row):
 
     lines = row[SUMMARY_TOPIC].strip().splitlines()
 
-    special_desc = []
-    i = 0
     if get_training(row):
-        for i, line in enumerate(lines):
-            # Skip lines starting with curriculum numbers
-            if not re.match(r'\(([0-9]|\.)*\)  ', line):
-                break
+        # Skip lines starting with curriculum numbers
+        i = count_leading(lines, lambda l: re.match(r'\(([0-9]|\.)*\)  ', l))
     elif typ == EXERCISE:
         # First 3 lines: Ebene, Land, Meldefrist
         i = 3
     elif typ in [MISSION, MISC_RELIEF]:
         # First 2 lines: Land, Anforderer
         i = 2
+    else:
+        i = 0
     special_desc = lines[:i]
     indesc = lines[i:]
 
@@ -263,6 +261,12 @@ def sanitize_persons(s):
 def format_list(ss):
     prefix = '  *' + chr(160) # NO-BREAK SPACE
     return '\n'.join([prefix + sanitize(s) for s in ss])
+
+def count_leading(xs, cond):
+    i = 0
+    while i < len(xs) and cond(xs[i]):
+        i = i + 1
+    return i
 
 def error(msg):
     showerror("Fehler", msg)
