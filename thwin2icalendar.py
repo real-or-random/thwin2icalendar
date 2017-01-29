@@ -173,7 +173,6 @@ def get_tags(indesc):
 
 def get_summary_description_categories(row):
     typ = get_type(row)
-    desc = typ + '\n\n'
 
     lines = row[SUMMARY_TOPIC].strip().splitlines()
 
@@ -195,6 +194,7 @@ def get_summary_description_categories(row):
     if indesc and not indesc[0]:
         indesc.pop(0)
 
+    desc = typ + '\n\n'
     if indesc:
         desc += 'Beschreibung:\n  '
         desc += '\n  '.join(indesc)
