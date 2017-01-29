@@ -212,7 +212,7 @@ def get_summary_description_categories(row):
 
     if row[RESPONSIBLE]:
         responsible = sanitize_persons(row[RESPONSIBLE]).splitlines()
-        desc += 'Leitende:\n' + format_list(responsible) + '\n\n'
+        desc += 'Leitende Teilnehmer:\n' + format_list(responsible) + '\n\n'
 
     if row[PARTICIPANTS]:
         participants = sanitize_persons(row[PARTICIPANTS]).splitlines()
