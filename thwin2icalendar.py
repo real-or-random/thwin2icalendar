@@ -36,6 +36,9 @@ EXERCISE = 'Übung / Wettkampf'
 MISSION = 'Einsatz'
 MISC_RELIEF = 'sonstige technische Hilfeleistung'
 
+# OINB
+JOINT_TRAINING = 'gemeinsame Ausbildung'
+
 FIELDNAMES = [START, END, LOCATION, TYPE, CLOTHES, SUMMARY_TOPIC, RESPONSIBLE, PARTICIPANTS]
 
 TZ_DEF = b'''BEGIN:VTIMEZONE\r\n\
@@ -194,13 +197,18 @@ def get_summary_description_categories(row):
     if indesc and not indesc[0]:
         indesc.pop(0)
 
+    # OINB: Hide topics for joint training
+    joint = indesc and indesc[0] == JOINT_TRAINING
+    if joint:
+        typ = JOINT_TRAINING
+
     desc = typ + '\n\n'
-    if indesc:
+    if indesc and not joint:
         desc += 'Beschreibung:\n  '
         desc += '\n  '.join(indesc)
         desc += '\n\n'
 
-    if special_desc:
+    if special_desc and not joint:
         if get_training(row):
             desc += 'Themen:\n'
         else:
@@ -210,7 +218,7 @@ def get_summary_description_categories(row):
     if row[CLOTHES]:
         desc += 'Bekleidung:\n  ' + row[CLOTHES].strip() + '\n\n'
 
-    if row[RESPONSIBLE]:
+    if row[RESPONSIBLE] and not joint:
         responsible = sanitize_persons(row[RESPONSIBLE]).splitlines()
         desc += 'Leitende Teilnehmer:\n' + format_list(responsible) + '\n\n'
 
