@@ -3,7 +3,7 @@
 """
 THWin2iCalendar - Converts CSV output from THWin to an iCalendar
 
-Written in 2015-2017 by Tim Ruffing <tim@timruffing.de>
+Written in 2015-2018 by Tim Ruffing <tim@timruffing.de>
 
 To the extent possible under law, the author(s) have dedicated all copyright and related and neighboring rights to this software to the public domain worldwide. This software is distributed without any warranty.
 
@@ -31,6 +31,7 @@ CLOTHES = 'Bekleidung'
 SUMMARY_TOPIC = 'Thema'
 RESPONSIBLE = 'Leitende'
 PARTICIPANTS = 'Teilnehmer'
+INSTRUCTIONS = 'Belehrungen/Unterweisungen'
 
 EXERCISE = 'Übung / Wettkampf'
 MISSION = 'Einsatz'
@@ -192,7 +193,19 @@ def get_summary_description_categories(row):
     else:
         i = 0
     special_desc = lines[:i]
-    indesc = lines[i:]
+    remainder = lines[i:]
+
+    # Check for associated instructions
+    if remainder and remainder[0].startswith(INSTRUCTIONS + ': '):
+        remainder[0] = remainder[0][len(INSTRUCTIONS)+2:]
+        # Find first empty line
+        j = count_leading(remainder, lambda l: l)
+        # Remove trailing commas in all but last line
+        instructions = [ins.split(',')[0] for ins in remainder[:j]]
+        indesc = remainder[j+1:]
+    else:
+        instructions = None
+        indesc = remainder
 
     # Remove empty line between special description and description
     if indesc and not indesc[0]:
@@ -211,6 +224,9 @@ def get_summary_description_categories(row):
             desc += 'Details:\n'
         desc += format_list(special_desc) + '\n\n'
 
+    if instructions:
+        desc += INSTRUCTIONS + ':\n' + format_list(instructions) + '\n\n'
+
     if row[CLOTHES]:
         desc += 'Bekleidung:\n  ' + row[CLOTHES].strip() + '\n\n'
 
@@ -223,6 +239,8 @@ def get_summary_description_categories(row):
         desc += 'Teilnehmer:\n' + format_list(participants)
 
     categories = [typ]
+    if instructions:
+        categories.append(INSTRUCTIONS)
 
     if indesc and indesc[0]:
         summary = indesc[0]
