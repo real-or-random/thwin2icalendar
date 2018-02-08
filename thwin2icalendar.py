@@ -151,7 +151,7 @@ def create_event(row):
     return event
 
 def parse_date(s):
-    d = datetime.strptime(s, '%d.%m.%Y, %H:%M:%S')
+    d = datetime.strptime(s, '%d.%m.%Y %H:%M:%S')
     return d.replace(tzinfo = timezone('Europe/Berlin'))
 
 def get_dtstart(row):
