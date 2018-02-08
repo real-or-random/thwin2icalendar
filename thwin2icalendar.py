@@ -181,8 +181,11 @@ def get_summary_description_categories(row):
         # Skip lines starting with curriculum numbers
         i = count_leading(lines, lambda l: re.match(r'\(([0-9]|\.)*\)  ', l))
     elif typ == EXERCISE:
-        # First 3 lines: Ebene, Land, Meldefrist
-        i = 3
+        # First 3 lines: Ebene, Land, Meldefrist (optional)
+        if lines[2].startswith('Meldefrist: '):
+            i = 3
+        else:
+            i = 2
     elif typ in [MISSION, MISC_RELIEF]:
         # First 2 lines: Land, Anforderer
         i = 2
