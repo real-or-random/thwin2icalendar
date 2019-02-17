@@ -236,7 +236,11 @@ def get_summary_description_categories(row):
 
     if row[PARTICIPANTS]:
         participants = sanitize_persons(row[PARTICIPANTS]).splitlines()
-        desc += 'Teilnehmer:\n' + format_list(participants)
+        # Privacy:
+        # Skip ordinary Helfer because they typically appear after attendance has been determined
+        participants = [p for p in participants if p[-5:] != ' (He)']
+        if participants != []:
+            desc += 'Teilnehmer:\n' + format_list(participants)
 
     categories = [typ]
     if instructions:
