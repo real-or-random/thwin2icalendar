@@ -3,7 +3,7 @@
 """
 THWin2iCalendar - Converts CSV output from THWin to an iCalendar
 
-Written in 2015-2018 by Tim Ruffing <tim@timruffing.de>
+Written in 2015-2019 by Tim Ruffing <tim@timruffing.de>
 
 To the extent possible under law, the author(s) have dedicated all copyright and related and neighboring rights to this software to the public domain worldwide. This software is distributed without any warranty.
 
